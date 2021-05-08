@@ -4,24 +4,25 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.github.kyuubiran.ezxhelper.init.InitFields.appContext
 import com.github.kyuubiran.ezxhelper.utils.Log
-import java.lang.Exception
 
 object Utils {
-    val DATAFILENAME = "MIUIDockConfig"
+    private const val DATA_FILE_NAME = "MIDockConfig"
 
-    fun dip2px(context: Context, dpValue: Int): Int {
-        val scale = context.resources.displayMetrics.density
-        return (dpValue * scale + 0.5f).toInt()
+    fun dip2px(dpValue: Int): Int {
+        return (dpValue * appContext.resources.displayMetrics.density + 0.5f).toInt()
     }
 
-    fun px2dip(context: Context, pxValue: Int): Int {
-        val scale = context.resources.displayMetrics.density
-        return (pxValue / scale + 0.5f).toInt()
+    fun px2dip(pxValue: Int): Int {
+        return (pxValue / appContext.resources.displayMetrics.density + 0.5f).toInt()
+    }
+
+    fun sp2px(spValue: Float): Float {
+        return spValue * appContext.resources.displayMetrics.scaledDensity + 0.5f
     }
 
     fun getEditor(): SharedPreferences.Editor? {
         return try {
-            appContext.getSharedPreferences(DATAFILENAME, Context.MODE_PRIVATE).edit()
+            appContext.getSharedPreferences(DATA_FILE_NAME, Context.MODE_PRIVATE).edit()
         } catch (e: Exception) {
             null
         }
@@ -30,7 +31,7 @@ object Utils {
     fun saveData(key: String, value: Any) {
         try {
             val sharedPreferences =
-                appContext.getSharedPreferences(DATAFILENAME, Context.MODE_PRIVATE)
+                    appContext.getSharedPreferences(DATA_FILE_NAME, Context.MODE_PRIVATE)
             val editor = sharedPreferences.edit()
             when (value) {
                 is Int -> editor.putInt(key, value)
@@ -47,13 +48,13 @@ object Utils {
     }
 
     fun getData(key: String, defValue: Int): Int {
-        try {
+        return try {
             val sharedPreferences =
-                appContext.getSharedPreferences(DATAFILENAME, Context.MODE_PRIVATE)
-            return sharedPreferences.getInt(key, defValue)
+                    appContext.getSharedPreferences(DATA_FILE_NAME, Context.MODE_PRIVATE)
+            sharedPreferences.getInt(key, defValue)
         } catch (e: Throwable) {
             // 也许是模块尚未加载
-            return defValue
+            defValue
         }
     }
 }
