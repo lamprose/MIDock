@@ -2,6 +2,7 @@ package io.lamprose.midock
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import com.github.kyuubiran.ezxhelper.init.InitFields.appContext
 import com.github.kyuubiran.ezxhelper.utils.Log
 
@@ -31,7 +32,7 @@ object Utils {
     fun saveData(key: String, value: Any) {
         try {
             val sharedPreferences =
-                    appContext.getSharedPreferences(DATA_FILE_NAME, Context.MODE_PRIVATE)
+                appContext.getSharedPreferences(DATA_FILE_NAME, Context.MODE_PRIVATE)
             val editor = sharedPreferences.edit()
             when (value) {
                 is Int -> editor.putInt(key, value)
@@ -50,11 +51,21 @@ object Utils {
     fun getData(key: String, defValue: Int): Int {
         return try {
             val sharedPreferences =
-                    appContext.getSharedPreferences(DATA_FILE_NAME, Context.MODE_PRIVATE)
+                appContext.getSharedPreferences(DATA_FILE_NAME, Context.MODE_PRIVATE)
             sharedPreferences.getInt(key, defValue)
         } catch (e: Throwable) {
             // 也许是模块尚未加载
             defValue
+        }
+    }
+
+    fun getVersionName(): String? {
+        return try {
+            val packageManager: PackageManager = appContext.packageManager
+            packageManager.getPackageInfo(appContext.packageName, 0).versionName
+        } catch (e: Exception) {
+            Log.e(e, "getVersionName")
+            null
         }
     }
 }

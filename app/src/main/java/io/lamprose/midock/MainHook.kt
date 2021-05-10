@@ -24,6 +24,7 @@ class MainHook : IXposedHookLoadPackage, IXposedHookInitPackageResources {
         const val MIUI_HOME_LAUNCHER_PACKAGENAME = "com.miui.home"
         const val DEVICE_CONFIG_CLASSNAME = "$MIUI_HOME_LAUNCHER_PACKAGENAME.launcher.DeviceConfig"
         const val LAUNCHER_CLASSNAME = "$MIUI_HOME_LAUNCHER_PACKAGENAME.launcher.Launcher"
+        private var isAlpha = false
 
         // 单位dip
         const val DOCK_RADIUS = 20
@@ -56,6 +57,7 @@ class MainHook : IXposedHookLoadPackage, IXposedHookInitPackageResources {
             m.name == "attachBaseContext" && m.parameterTypes[0] == Context::class.java
         }.hookAfter {
             EzXHelperInit.initAppContext(it.args[0] as Context)
+            isAlpha = Utils.getVersionName()!!.startsWith("ALPHA")
             showSettingDialog()
             launcherHook(lpparam)
             deviceConfigHook(lpparam)
@@ -77,7 +79,11 @@ class MainHook : IXposedHookLoadPackage, IXposedHookInitPackageResources {
         }.hookBefore {
             Log.d("hook start")
             val context = it.thisObject.invokeMethod("getContext") as Context
-            val dialogBuilder = loadClass("miui.app.AlertDialog${'$'}Builder")
+            Utils.getVersionName()?.let { ver -> Log.d(ver) }
+            Log.d(isAlpha.toString())
+            val dialogBuilderClzStr =
+                if (isAlpha) "miuix.appcompat.app.AlertDialog${'$'}Builder" else "miui.app.AlertDialog${'$'}Builder"
+            val dialogBuilder = loadClass(dialogBuilderClzStr)
                 .getConstructor(Context::class.java)
                 .newInstance(context)
             dialogBuilder.apply {
