@@ -9,13 +9,13 @@ import android.graphics.drawable.RippleDrawable
 import android.os.Bundle
 import android.view.View
 import android.widget.*
-import io.lamprose.midock.ui.SettingSeekBar
 import com.github.kyuubiran.ezxhelper.init.EzXHelperInit
 import com.github.kyuubiran.ezxhelper.utils.*
 import de.robv.android.xposed.*
 import de.robv.android.xposed.callbacks.XC_InitPackageResources
 import de.robv.android.xposed.callbacks.XC_LayoutInflated
 import de.robv.android.xposed.callbacks.XC_LoadPackage
+import io.lamprose.midock.ui.SettingSeekBar
 import io.lamprose.midock.ui.SettingText
 import kotlin.system.exitProcess
 
@@ -317,6 +317,12 @@ class MainHook : IXposedHookLoadPackage, IXposedHookInitPackageResources {
                         param.result = Utils.dip2px(Utils.getData("DOCK_BOTTOM", DOCK_BOTTOM))
                     }
                 })
+            // 宽度变化量
+            XposedHelpers.findAndHookMethod(
+                _DEVICE_CONFIG_CLASS,
+                "getSearchBarWidthDelta",
+                XC_MethodReplacement.returnConstant(0)
+            )
         } catch (e: Exception) {
             XposedBridge.log("[MIDock] DeviceConfigHook Error:" + e.message)
         }
