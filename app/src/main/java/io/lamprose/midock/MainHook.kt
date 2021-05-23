@@ -52,7 +52,7 @@ class MainHook : IXposedHookLoadPackage, IXposedHookInitPackageResources {
             return
         }
         EzXHelperInit.initHandleLoadPackage(lpparam)
-        EzXHelperInit.setLogTag("MIUIDock")
+        EzXHelperInit.setLogTag("MIDock")
         findMethodByCondition("$MIUI_HOME_LAUNCHER_PACKAGENAME.launcher.Application") { m ->
             m.name == "attachBaseContext" && m.parameterTypes[0] == Context::class.java
         }.hookAfter {
@@ -91,19 +91,32 @@ class MainHook : IXposedHookLoadPackage, IXposedHookInitPackageResources {
                     SettingSeekBar.Builder(context, "Dock圆角", Utils.getData("DOCK_RADIUS", 20))
                         .build()
                 val heightSeek =
-                    SettingSeekBar.Builder(context, "Dock高度", Utils.getData("DOCK_HEIGHT", 84))
-                        .build()
+                    SettingSeekBar.Builder(
+                        context,
+                        "Dock高度",
+                        Utils.getData("DOCK_HEIGHT", 84),
+                        50, 200
+                    ).build()
                 val sideSeek =
-                    SettingSeekBar.Builder(context, "Dock距离屏幕两侧", Utils.getData("DOCK_SIDE", 30))
-                        .build()
+                    SettingSeekBar.Builder(
+                        context,
+                        "Dock距离屏幕两侧",
+                        Utils.getData("DOCK_SIDE", 30),
+                        maxVal = 200
+                    ).build()
                 val bottomSeek =
-                    SettingSeekBar.Builder(context, "Dock距离屏幕底部", Utils.getData("DOCK_BOTTOM", 23))
-                        .build()
+                    SettingSeekBar.Builder(
+                        context,
+                        "Dock距离屏幕底部",
+                        Utils.getData("DOCK_BOTTOM", 23),
+                        maxVal = 200
+                    ).build()
                 val iconBottomSeek =
                     SettingSeekBar.Builder(
                         context,
                         "图标区域距离屏幕底部",
-                        Utils.getData("DOCK_ICON_BOTTOM", 35)
+                        Utils.getData("DOCK_ICON_BOTTOM", 35),
+                        maxVal = 200
                     ).build()
                 var confirmDelete = false
                 invokeMethod("setTitle", arrayOf("Dock设置"), arrayOf(CharSequence::class.java))
@@ -239,7 +252,7 @@ class MainHook : IXposedHookLoadPackage, IXposedHookInitPackageResources {
                     }
                 })
         } catch (e: Exception) {
-            XposedBridge.log("[MIUIDock] LauncherHook Error:" + e.message)
+            XposedBridge.log("[MIDock] LauncherHook Error:" + e.message)
         }
     }
 
@@ -305,7 +318,7 @@ class MainHook : IXposedHookLoadPackage, IXposedHookInitPackageResources {
                     }
                 })
         } catch (e: Exception) {
-            XposedBridge.log("[MIUIDock] DeviceConfigHook Error:" + e.message)
+            XposedBridge.log("[MIDock] DeviceConfigHook Error:" + e.message)
         }
     }
 
@@ -333,7 +346,7 @@ class MainHook : IXposedHookLoadPackage, IXposedHookInitPackageResources {
                     }
                 })
         } catch (e: Exception) {
-            XposedBridge.log("[MIUIDock] ResourcesReplacement Error:" + e.message)
+            XposedBridge.log("[MIDock] ResourcesReplacement Error:" + e.message)
         }
     }
 

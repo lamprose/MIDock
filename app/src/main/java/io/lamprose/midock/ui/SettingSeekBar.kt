@@ -1,5 +1,6 @@
 package io.lamprose.midock.ui
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.ViewGroup
 import android.widget.LinearLayout
@@ -8,7 +9,9 @@ import android.widget.TextView
 import com.github.kyuubiran.ezxhelper.init.InitFields
 import io.lamprose.midock.Utils
 
-class SettingSeekBar(context: Context) : LinearLayout(context) {
+@SuppressLint("ViewConstructor")
+class SettingSeekBar(context: Context, minValue: Int = 0, maxValue: Int = 100) :
+    LinearLayout(context) {
     var text: String = ""
         set(value) {
             field = value
@@ -23,8 +26,7 @@ class SettingSeekBar(context: Context) : LinearLayout(context) {
     private val textView: TextView
     private val valueView: TextView
     private val seekBar: SeekBar
-    private var minValue = 0
-    private var maxValue = 100
+
 
     init {
         orientation = VERTICAL
@@ -55,7 +57,6 @@ class SettingSeekBar(context: Context) : LinearLayout(context) {
         addView(textView.apply {
             setPadding(0, 0, 0, Utils.dip2px(5))
         })
-
         addView(seekBar)
         addView(LinearLayout(context).apply {
             orientation = HORIZONTAL
@@ -74,9 +75,11 @@ class SettingSeekBar(context: Context) : LinearLayout(context) {
     class Builder(
         private val mContext: Context = InitFields.appContext,
         private val mText: String,
-        private val defaultValue: Int = 0
+        private val defaultValue: Int = 0,
+        private val minVal: Int = 0,
+        private val maxVal: Int = 100
     ) {
-        fun build() = SettingSeekBar(mContext).apply {
+        fun build() = SettingSeekBar(mContext, minVal, maxVal).apply {
             text = mText
             value = defaultValue
         }
