@@ -68,4 +68,14 @@ object Utils {
             null
         }
     }
+
+    fun getVersionCode(): Long {
+        return try {
+            val packageManager: PackageManager = appContext.packageManager
+            packageManager.getPackageInfo(appContext.packageName, 0).longVersionCode
+        } catch (e: Exception) {
+            Log.e(e, "getVersionName")
+            -1L
+        }
+    }
 }

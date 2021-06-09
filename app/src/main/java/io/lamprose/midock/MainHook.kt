@@ -25,6 +25,7 @@ class MainHook : IXposedHookLoadPackage, IXposedHookInitPackageResources {
         const val DEVICE_CONFIG_CLASSNAME = "$MIUI_HOME_LAUNCHER_PACKAGENAME.launcher.DeviceConfig"
         const val LAUNCHER_CLASSNAME = "$MIUI_HOME_LAUNCHER_PACKAGENAME.launcher.Launcher"
         private var isAlpha = false
+        private var versionCode: Long = -1L
 
         // 单位dip
         const val DOCK_RADIUS = 20
@@ -58,6 +59,7 @@ class MainHook : IXposedHookLoadPackage, IXposedHookInitPackageResources {
         }.hookAfter {
             EzXHelperInit.initAppContext(it.args[0] as Context)
             isAlpha = Utils.getVersionName()!!.startsWith("ALPHA")
+            versionCode = Utils.getVersionCode()
             showSettingDialog()
             launcherHook(lpparam)
             deviceConfigHook(lpparam)
@@ -82,7 +84,7 @@ class MainHook : IXposedHookLoadPackage, IXposedHookInitPackageResources {
             Utils.getVersionName()?.let { ver -> Log.d(ver) }
             Log.d(isAlpha.toString())
             val dialogBuilderClzStr =
-                if (isAlpha) "miuix.appcompat.app.AlertDialog${'$'}Builder" else "miui.app.AlertDialog${'$'}Builder"
+                if (isAlpha || versionCode >= 421153106L) "miuix.appcompat.app.AlertDialog${'$'}Builder" else "miui.app.AlertDialog${'$'}Builder"
             val dialogBuilder = loadClass(dialogBuilderClzStr)
                 .getConstructor(Context::class.java)
                 .newInstance(context)
@@ -158,6 +160,13 @@ class MainHook : IXposedHookLoadPackage, IXposedHookInitPackageResources {
                 )
                 val linearLayout = LinearLayout(context).apply {
                     orientation = LinearLayout.VERTICAL
+                    if (isAlpha || versionCode >= 421153106L)
+                        setPadding(
+                            Utils.dip2px(20),
+                            Utils.dip2px(20),
+                            Utils.dip2px(20),
+                            Utils.dip2px(20)
+                        )
                     addView(radiusSeek)
                     addView(heightSeek)
                     addView(sideSeek)
@@ -347,6 +356,7 @@ class MainHook : IXposedHookLoadPackage, IXposedHookInitPackageResources {
                         backgroundShape.cornerRadius =
                             Utils.dip2px(Utils.getData("DOCK_RADIUS", DOCK_RADIUS))
                                 .toFloat()
+                        backgroundShape.setStroke(0, 0)
                         background.setDrawable(0, backgroundShape)
                         return background
                     }
