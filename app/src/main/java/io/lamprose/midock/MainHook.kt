@@ -46,6 +46,15 @@ class MainHook : IXposedHookLoadPackage, IXposedHookInitPackageResources {
             "bg_search_bar_dark",
             "bg_search_bar_light"
         )
+        val drawableNameNewList = arrayOf(
+            "bg_search_bar_black8_white11",
+            "bg_search_bar_button_dark",
+            "bg_search_bar_button_light",
+            "bg_search_bar_dark",
+            "bg_search_bar_light",
+            "bg_search_bar_input_dark",
+            "bg_search_bar_input_light"
+        )
     }
 
     override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
@@ -192,6 +201,7 @@ class MainHook : IXposedHookLoadPackage, IXposedHookInitPackageResources {
         if (resparam.packageName != MIUI_HOME_LAUNCHER_PACKAGENAME) {
             return
         }
+
         resparam.res.hookLayout(
             MIUI_HOME_LAUNCHER_PACKAGENAME,
             "layout",
@@ -200,7 +210,7 @@ class MainHook : IXposedHookLoadPackage, IXposedHookInitPackageResources {
                 override fun handleLayoutInflated(liparam: LayoutInflatedParam) {
                     // 替换资源圆角
                     val targetView = liparam.view
-                    drawableNameList.forEach { drawableName ->
+                    (if (isAlpha || versionCode >= 421153106L) drawableNameNewList else drawableNameList).forEach { drawableName ->
                         resetDockRadius(
                             resparam.res,
                             targetView.context,
